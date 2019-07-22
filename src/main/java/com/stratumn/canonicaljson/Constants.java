@@ -1,7 +1,7 @@
 package com.stratumn.canonicaljson;
 /**
  * Common Characters 
- * @author Ahmad Hamid
+ * @author STP
  *
  */
 public final class Constants {
