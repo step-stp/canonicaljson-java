@@ -21,7 +21,7 @@ import java.util.Vector;
 import java.util.regex.Pattern;
 /***
  * 
- * @author Ahmad Hamid
+ * @author STP
  *
  */
 public class Parser {
