@@ -9,7 +9,7 @@ import java.util.Vector;
 
 /***
  * Transformer converts and JSON stream to an object Vector / Map / Java Object
- * @author Ahmad Hamid
+ * @author STP
  *
  */
 public class Transformer {
