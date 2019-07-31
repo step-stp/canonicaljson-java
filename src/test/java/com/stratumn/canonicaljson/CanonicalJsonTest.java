@@ -1,3 +1,19 @@
+/*
+  Copyright 2017 Stratumn SAS. All rights reserved.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+
 package com.stratumn.canonicaljson;
 
 import java.io.File;
@@ -22,8 +38,7 @@ public class CanonicalJsonTest {
 	      Assert.assertEquals(expected , actual);
       }
       catch(IOException e)
-      {
-         // TODO Auto-generated catch block
+      {       
          e.printStackTrace();
       }
 	}
@@ -44,8 +59,7 @@ public class CanonicalJsonTest {
 		String expected = null;
 		if (expectedFile!=null)
 			expected = FileUtils.readFileToString(new File(expectedFile), "UTF-8").trim(); 
-		String actual =  CanonicalJson.stringify(CanonicalJson.parse(rawInput)) ;
-		//FileUtils.writeStringToFile(new File(inputFileObj.getParent(), "output.json"), actual, "UTF-8");
+		String actual =  CanonicalJson.stringify(CanonicalJson.parse(rawInput)) ;	
 		return new String[] {rawInput, expected, actual};
 	}
 	 
@@ -57,7 +71,6 @@ public class CanonicalJsonTest {
 		List<File> testFolders = getTestFolders(rootFolder);
 
 		for (File testfolder : testFolders) {
-//			System.out.println(testfolder.getAbsolutePath());
 			File input = new File(testfolder, "input.json");
 			File expected = new File(testfolder, "expected.json");
 			if (!input.exists()) {
@@ -70,8 +83,7 @@ public class CanonicalJsonTest {
 				String[] expact = applyParseStringify(input.getAbsolutePath(), expected == null ? null : expected.getAbsolutePath());
 				if (!expact[2].equals(expact[1]))
 					System.err.println(testfolder.getPath() + "\rValues not equal Expected/Actual:\r" + expact[0].replaceAll("\\r|\\n|\\s", "")  + "\r" + expact[1] + "\r" + expact[2]);
-				/*else
-				   System.out.println("Successful:\r" + expact[1]  );*/
+			
 			} catch (IOException e) {
 				System.err.println("Malformed JSON: " + e.getLocalizedMessage());
 				

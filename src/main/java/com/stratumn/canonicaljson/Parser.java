@@ -1,3 +1,19 @@
+/*
+  Copyright 2017 Stratumn SAS. All rights reserved.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+
 package com.stratumn.canonicaljson;
 
 import static com.stratumn.canonicaljson.Constants.C_BACKSPACE;
@@ -25,8 +41,6 @@ import java.util.regex.Pattern;
  * 
  * Parser class is responsible for parsing JSON streams and returning an object 
  * 
- * @author STP
- * 
  */
 public class Parser
 {
@@ -35,15 +49,19 @@ public class Parser
    private static final Pattern BOOLEAN_PATTERN = Pattern.compile("true|false");
 
    private static final Pattern NUMBER_PATTERN = Pattern.compile("-?[0-9]+(\\.[0-9]+)?([eE][-+]?[0-9]+)?");
+   
+   /***
+    * Matches Leading Zero. 
+    */
+   private static final Pattern BAD_NUMBER_PATTERN = Pattern.compile("^-?0\\d+");
+   
+   
    /***
     * Matches characters valid for a unicode characater. 
     */
    private static final Pattern HEX_PATTERN = Pattern.compile("([0-9,a-f,A-F]){4}");
-   /* Regular expressions that matches characters otherwise inexpressible in 
-   JSON (U+0022 QUOTATION MARK, U+005C REVERSE SOLIDUS, 
-   and ASCII control characters U+0000 through U+001F) or UTF-8 (U+D800 through U+DFFF) */
-   private static final Pattern FORBIDDEN = Pattern.compile("[\\u0022\\u005c\\u0000-\\u001F\\ud800-\\udfff]");
 
+     
    /***
     * index and value of the current character
     */
@@ -119,10 +137,10 @@ public class Parser
          if(next) scanFor(C_COMMA);
          next = true;
          scanFor(C_DOUBLE_QUOTE);
-         //chr = "
+       
          String name = parseQuotedString();
          scanFor(C_COLON);
-         //chr = : 
+       
          if(dict.put(name, parseElement()) != null)
          {
             throw new IOException("Duplicate property: " + name);
@@ -181,6 +199,9 @@ public class Parser
       }
       if(NUMBER_PATTERN.matcher(token).matches())
       {
+    	  if (BAD_NUMBER_PATTERN.matcher(token).find())
+    		  throw new IOException("Bad number: leading zero: " + token);
+    	  
          return new BigDecimal(token);
       }
       else
@@ -211,6 +232,11 @@ public class Parser
       if(chr != C_DOUBLE_QUOTE) throw new IOException("Bad String");
       while(next() != C_DOUBLE_QUOTE)
       {
+    		if (chr < ' ') {
+				throw new IOException(chr == '\n' ? "Unterminated string literal"
+						: "Unescaped control character: 0x" + Integer.toString(chr, 16));
+    		}
+    		
             if(chr == C_BACK_SLASH)
             {
                switch(next())
@@ -241,9 +267,8 @@ public class Parser
                      throw new IOException("Unsupported escape:" + chr);
                }
             }
-//            else 
-//               if(FORBIDDEN.matcher(Character.toString(chr)).matches())
-//                  throw new IOException("Unescaped control character: " + Integer.toString(chr, 16));
+          
+
          result.append(chr);
       }
       return result.toString();
