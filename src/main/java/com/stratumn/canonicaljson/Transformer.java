@@ -13,17 +13,19 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 /***
  * Transformer converts an object Vector / Map / Java Object to JSON stream 
+ * 
+ * @author STP
  *
  */
 public class Transformer
-{
-
+{ 
    private StringBuilder buffer;
    /* Regular expressions that matches characters otherwise inexpressible in 
      JSON (U+0022 QUOTATION MARK, U+005C REVERSE SOLIDUS, 
@@ -66,24 +68,30 @@ public class Transformer
       * \\ U+005C REVERSE SOLIDUS ("backslash"), and
       * using six-character \\u00xx uppercase hexadecimal escape sequences for control characters that require escaping but lack a two-character sequence, and
       * using six-character \\uDxxx uppercase hexadecimal escape sequences for lone surrogates
-     * @param value
+     * @param value 
      */
-   private void serializeString(String value)
+   private void serializeString(String value) 
    {
       buffer.append(C_DOUBLE_QUOTE);
       if(!FORBIDDEN.matcher(value).find())
          buffer.append(value);
       else
-      {
-         for(char c : value.toCharArray())
-         {
-            if(!FORBIDDEN.matcher(Character.toString(c)).find())
+      {   
+         char[] chars = value.toCharArray();
+         for (int i=0; i< chars.length; i++)
+         { 
+            if(!FORBIDDEN.matcher(Character.toString(chars[i])).find())
             {
-               buffer.append(c);
+               buffer.append(chars[i]);
                continue;
-            }
+            }  
+            if (Character.isSurrogate(chars[i]) && chars.length >i+1 && Character.isSurrogatePair(chars[i], chars[i+1]) )
+            {
+                  buffer.appendCodePoint(Character.toCodePoint(chars[i], chars[++i])); 
+                  continue; 
+            } 
             //escape special characters and unicode characters.
-            switch(c)
+            switch(chars[i])
             {
                case C_LINE_FEED:
                   escape('n');
@@ -105,15 +113,15 @@ public class Transformer
 
                case C_DOUBLE_QUOTE:
                case C_BACK_SLASH:
-                  escape(c);
+                  escape(chars[i]);
                break;
-               default:
-                  escape('u');
-                  String hex = String.format("%04x", (int) c);
-                  buffer.append(hex.toUpperCase());
+               default: 
+                     escape('u');
+                     String hex = String.format("%04x", (int) chars[i]).toUpperCase();
+                     buffer.append(hex);        
                break;
             }
-         }
+         }        
       }
       buffer.append(C_DOUBLE_QUOTE);
    }
@@ -162,9 +170,12 @@ public class Transformer
    {
       if(o instanceof TreeMap)
       {
+         
+         TreeMap<String, Object> sortedTree = new TreeMap<String,Object>(new LexComparator()); 
+         sortedTree.putAll((TreeMap<String, Object>) o);
          buffer.append('{');
          boolean next = false;
-         for(Map.Entry<String, Object> keyValue : ((TreeMap<String, Object>) o).entrySet())
+         for(Map.Entry<String, Object> keyValue : sortedTree.entrySet())
          {
             if(next)
             {
@@ -179,7 +190,7 @@ public class Transformer
       }
       else
          if(o instanceof Collection<?>)
-         {
+         {  
             buffer.append('[');
             boolean next = false;
             for(Object value : ((Collection<?>) o))
@@ -225,5 +236,37 @@ public class Transformer
    public byte[] getEncodedUTF8() throws IOException
    {
       return getEncodedString().getBytes("utf-8");
+   }
+   
+   /***
+    * Compares strings lexicographically
+    *  MUST order the members of all objects lexicographically by the UCS (Unicode Character Set) code points of their names
+    *  preserving and utilizing the code points in U+D800 through U+DFFF (inclusive) for all lone surrogates
+    */
+   class LexComparator implements Comparator<String>{
+       
+         @Override
+         public int compare(String keyA, String keyB)
+         {   
+           int result = 0;
+           if(!keyA.equals(keyB))
+           for(int i=0 ; i<keyA.length() ; i++)
+           { 
+               if(i > keyB.length()-1)
+               {
+                   result = 1;
+                   break;
+               } 
+               int aCodePoint =  keyA.codePointAt(i);
+               int bCodePoint =  keyB.codePointAt(i);
+               if(aCodePoint != bCodePoint)
+               {
+                   result =Integer.valueOf(aCodePoint).compareTo(bCodePoint);  
+                   break;
+               }
+           }
+           
+           return result;
+         } 
    }
 }

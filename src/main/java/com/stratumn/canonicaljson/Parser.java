@@ -25,6 +25,8 @@ import java.util.regex.Pattern;
  * 
  * Parser class is responsible for parsing JSON streams and returning an object 
  * 
+ * @author STP
+ * 
  */
 public class Parser
 {
@@ -238,9 +240,10 @@ public class Parser
                   default:
                      throw new IOException("Unsupported escape:" + chr);
                }
-            }else 
-               if(FORBIDDEN.matcher(Character.toString(chr)).matches())
-                  throw new IOException("Unescaped control character: " + Integer.toString(chr, 16));
+            }
+//            else 
+//               if(FORBIDDEN.matcher(Character.toString(chr)).matches())
+//                  throw new IOException("Unescaped control character: " + Integer.toString(chr, 16));
          result.append(chr);
       }
       return result.toString();

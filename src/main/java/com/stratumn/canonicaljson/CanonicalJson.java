@@ -4,6 +4,7 @@ package com.stratumn.canonicaljson;
 import java.io.IOException;
 /***
  * 
+ * @author STP
  * Helper class for canonicaliziong JSON
  * TODO support beans and datatypes by integrating GSON library and using generics to identify class type. 
  */

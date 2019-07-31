@@ -39,11 +39,11 @@ public class CanonicalJsonTest {
 	 */
 	private static String[] applyParseStringify(String inputFile,String expectedFile) throws IOException { 
 	    File inputFileObj = new File(inputFile);
-		String rawInput = FileUtils.readFileToString(inputFileObj, "CP1252");
+		String rawInput = FileUtils.readFileToString(inputFileObj, "UTF-8");
 		
 		String expected = null;
 		if (expectedFile!=null)
-			expected = FileUtils.readFileToString(new File(expectedFile), "CP1252").trim(); 
+			expected = FileUtils.readFileToString(new File(expectedFile), "UTF-8").trim(); 
 		String actual =  CanonicalJson.stringify(CanonicalJson.parse(rawInput)) ;
 		//FileUtils.writeStringToFile(new File(inputFileObj.getParent(), "output.json"), actual, "UTF-8");
 		return new String[] {rawInput, expected, actual};
