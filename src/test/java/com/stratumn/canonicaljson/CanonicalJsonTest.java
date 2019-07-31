@@ -40,13 +40,13 @@ public class CanonicalJsonTest
    private String[] applyParseStringify(String inputFile, String expectedFile) throws IOException
    {
       File inputFileObj = new File(inputFile);
-      String rawInput = String.join("", Files.readAllLines(inputFileObj.toPath(),Charset.forName("UTF-8")));// FileUtils.readFileToString(inputFileObj, "UTF-8");
+      String rawInput = String.join("", Files.readAllLines(inputFileObj.toPath(),Charset.forName("UTF-8")));
 
       String expected = null;
-      if(expectedFile != null) expected =String.join("", Files.readAllLines(new File(expectedFile).toPath(),Charset.forName("UTF-8"))); // FileUtils.readFileToString(new File(expectedFile), "UTF-8").trim();
+      if(expectedFile != null) expected =String.join("", Files.readAllLines(new File(expectedFile).toPath(),Charset.forName("UTF-8")));
       String actual = CanonicalJson.stringify(CanonicalJson.parse(rawInput));
-      Files.write(new File(inputFileObj.getParent(), "output.json").toPath(), actual.getBytes()/*.replaceAll(",",",\r\n")*/);
-//      FileUtils.writeStringToFile(, actual/*.replaceAll(",",",\r\n")*/, "UTF-8");
+      Files.write(new File(inputFileObj.getParent(), "output.json").toPath(), actual.getBytes());
+
       return new String[]{rawInput, expected, actual };
    }
 
@@ -113,13 +113,18 @@ public class CanonicalJsonTest
    private List<File> getTestFolders(File parentFolder)
    {
       List<File> testFoldersList = new ArrayList<File>();
-      File[] subFolders = parentFolder.listFiles();
-      for(File folder : subFolders)
-      {
-         if(new File(folder, "input.json").exists())
-            testFoldersList.add(folder);
-         else
-            testFoldersList.addAll(getTestFolders(folder));
+      
+      if(new File(parentFolder, "input.json").exists() || new File(parentFolder, "expected.json").exists())
+          testFoldersList.add(parentFolder);
+      else {
+	      File[] subFolders = parentFolder.listFiles();
+	      for(File folder : subFolders)
+	      {
+	         if(new File(folder, "input.json").exists() || new File(folder, "expected.json").exists())
+	            testFoldersList.add(folder);
+	         else
+	            testFoldersList.addAll(getTestFolders(folder));
+	      }
       }
       return testFoldersList;
    }
@@ -137,6 +142,7 @@ public class CanonicalJsonTest
          System.exit(-1);
       }
       File file = new File(args[0]); 
+      //File file = new File("C:\\Users\\ybatsh\\Downloads\\canonicaljson-java-master\\canonicaljson-java-master\\src\\test\\resources\\test\\tokens\\3.object-ordering"); 
       if (file.exists() )
          new CanonicalJsonTest().processTestFiles(file, false);
    }
