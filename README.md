@@ -1,7 +1,9 @@
 # canonicaljson-java
-To test build the project and run one of the following.
 
-RunTest.cmd /src/test/resources/test/
+1 - Make sure the Java home paths are added for the installed JDK
+2 - Using the command line run:
+
+RunTest.cmd <<put path for folder>>
 
 All subfolders with an input.json (and expected.json) will be picked up and processed as follows:
 1- The file input.json will be parsed 
