@@ -142,7 +142,7 @@ public class CanonicalJsonTest
          System.exit(-1);
       }
       File file = new File(args[0]); 
-      //File file = new File("C:\\Users\\ybatsh\\Downloads\\canonicaljson-java-master\\canonicaljson-java-master\\src\\test\\resources\\test\\tokens\\3.object-ordering"); 
+      
       if (file.exists() )
          new CanonicalJsonTest().processTestFiles(file, false);
    }
