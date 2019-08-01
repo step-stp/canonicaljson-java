@@ -1,9 +1,10 @@
 # canonicaljson-java
 
 1 - Make sure the Java home paths are added for the installed JDK
+
 2 - Using the command line run:
 
-RunTest.cmd <<put path for folder>>
+RunTest.cmd [put path for folder]
 
 All subfolders with an input.json (and expected.json) will be picked up and processed as follows:
 1- The file input.json will be parsed 
@@ -13,7 +14,7 @@ All subfolders with an input.json (and expected.json) will be picked up and proc
 
 or  
 
-RunTest.cmd filename.json
+RunTest.cmd [put path for JSON file]
 
 The input file will be parsed and the result object stringify-ed and an output.json will be created in the same folder. 
 
