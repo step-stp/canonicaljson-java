@@ -182,11 +182,11 @@ public class Transformer
    @SuppressWarnings("unchecked")
    private void serialize(Object o) throws IOException
    {
-      if(o instanceof TreeMap)
+      if(o instanceof Map)
       {
          
          TreeMap<String, Object> sortedTree = new TreeMap<String,Object>(new LexComparator()); 
-         sortedTree.putAll((TreeMap<String, Object>) o);
+         sortedTree.putAll((Map<String, Object>) o);
          buffer.append('{');
          boolean next = false;
          for(Map.Entry<String, Object> keyValue : sortedTree.entrySet())
