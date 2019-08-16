@@ -45,7 +45,7 @@ goto error
 
 IF NOT exist "target\canonicaljson\CanonicalJson.jar" (
 Echo Building classes
-	 mvnw.cmd  package -Dmaven.test.skip=true
+	 call mvnw.cmd  package  -DskipTests
 Echo Building complete
 )
 
