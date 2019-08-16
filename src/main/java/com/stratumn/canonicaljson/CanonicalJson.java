@@ -45,4 +45,15 @@ public class CanonicalJson {
     {
     	return new Parser(source).parse();
     }
+    
+    /***
+     * Parses a string to object and converts it back to string in canonical Json form 
+     * @param source
+     * @return
+     * @throws IOException
+     */
+    public static String canonizalize(String source) throws IOException
+    {
+       return new Transformer().transform(new Parser(source).parse());
+    }
 }
