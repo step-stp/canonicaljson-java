@@ -43,8 +43,8 @@ public class ParserTest {
     					  ,new Datum("1.21e1",new BigDecimal("12.1"),"decimal numbers")
     					  ,new Datum("\"\\ufb01\"","ﬁ","unicode encoded characters")
     					  ,new Datum("\"\\b\"","\b","short escaped characters")
-    					  ,new Datum("[]",new Vector<Object>(),"empty arrays") 
-    					  ,new Datum("[\"a\", 1, true]",new Vector<Object>(Arrays.asList(new Object[] {"a", new BigDecimal(1), new Boolean(true)})),"arrays")
+    					  ,new Datum("[]",new Object[0],"empty arrays") 
+    					  ,new Datum("[\"a\", 1, true]", new Object[] {"a", new BigDecimal(1), new Boolean(true)},"arrays")
     				} 
     		);
     		
@@ -55,7 +55,7 @@ public class ParserTest {
     		Object result ;
     		try {
     			result =   new Parser(dt.input ).parse() ;
-    			if (result!=dt.output && !result.equals(dt.output))
+    			if (result!=dt.output && !result.equals(dt.output)  && (result.getClass().isArray() && !Arrays.deepEquals((Object[])result,(Object[]) dt.output)) )
     				System.out.println("Testing failed on " + dt.description);
     		}catch (Exception e) {
     			System.out.println("Testing failed on " + dt.description);

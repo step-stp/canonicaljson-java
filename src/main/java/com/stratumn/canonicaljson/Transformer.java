@@ -28,11 +28,15 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 /***
  * Transformer converts an object Vector / Map / Java Object to JSON stream 
@@ -174,6 +178,7 @@ public class Transformer
       }
    }
 
+   
    /***
     * Attempts to serialize an object of type treemap, collection, null , string , boolean , bigdecimal
     * @param o
@@ -182,46 +187,50 @@ public class Transformer
    @SuppressWarnings("unchecked")
    private void serialize(Object o) throws IOException
    {
-      if(o instanceof Map)
+
+      if(o == null)
       {
-         
-         TreeMap<String, Object> sortedTree = new TreeMap<String,Object>(new LexComparator()); 
-         sortedTree.putAll((Map<String, Object>) o);
-         buffer.append('{');
-         boolean next = false;
-         for(Map.Entry<String, Object> keyValue : sortedTree.entrySet())
-         {
-            if(next)
-            {
-               buffer.append(',');
-            }
-            next = true;
-            serializeString(keyValue.getKey());
-            buffer.append(':');
-            serialize(keyValue.getValue());
-         }
-         buffer.append('}');
+         buffer.append("null");
       }
       else
-         if(o instanceof Collection<?>)
-         {  
-            buffer.append('[');
+         if(o instanceof Map)
+         {
+
+            TreeMap<String, Object> sortedTree = new TreeMap<String, Object>(new LexComparator());
+            sortedTree.putAll((Map<String, Object>) o);
+            buffer.append('{');
             boolean next = false;
-            for(Object value : ((Collection<?>) o))
+            for(Map.Entry<String, Object> keyValue : sortedTree.entrySet())
             {
                if(next)
                {
                   buffer.append(',');
                }
                next = true;
-               serialize(value);
+               serializeString(keyValue.getKey());
+               buffer.append(':');
+               serialize(keyValue.getValue());
             }
-            buffer.append(']');
+            buffer.append('}');
          }
          else
-            if(o == null)
+            if(o instanceof Collection<?> || o instanceof Object[] || o.getClass().isArray())
             {
-               buffer.append("null");
+               //validat
+               if(o instanceof Object[] || o.getClass().isArray()) o = Arrays.asList((Object[]) o);
+
+               buffer.append('[');
+               boolean next = false;
+               for(Object value : ((Collection<?>) o))
+               {
+                  if(next)
+                  {
+                     buffer.append(',');
+                  }
+                  next = true;
+                  serialize(value);
+               }
+               buffer.append(']');
             }
             else
                if(o instanceof String)
@@ -234,14 +243,23 @@ public class Transformer
                      buffer.append((Boolean) o);
                   }
                   else
-                     if(o instanceof Double || o instanceof BigDecimal || o instanceof Integer)
+                     if(o instanceof Double || o instanceof BigDecimal || o instanceof Integer || o instanceof Float)
                         serializeNumber(o.toString());
                      else
                      {
-                        throw new InternalError("Unknown object: " + o);
+                        try { 
+                           //attempt to serialize unknown type.
+                           String json = getGsonInstance().toJson(o);
+                           //parse and searialize it to make sure its canonicalized.
+                           serialize( new Parser(json).parse());
+                        }
+                        catch(Exception e)
+                        {
+                           throw new RuntimeException("Unknown object: " + o,e);
+                        }
                      }
    }
-
+   
    public String getEncodedString()
    {
       return buffer.toString();
@@ -251,6 +269,26 @@ public class Transformer
    {
       return getEncodedString().getBytes("utf-8");
    }
+   
+   /**
+    * Gson instance lazy initialization.
+    */
+   private Gson gson;
+   private Gson getGsonInstance()
+   {
+      if (gson==null)
+      {    
+         GsonBuilder builder = new GsonBuilder();
+            
+          builder.serializeNulls();
+
+          gson = builder.create();
+      
+      }
+      return gson;
+   }
+   
+ 
    
    /***
     * Compares strings lexicographically

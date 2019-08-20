@@ -17,12 +17,11 @@ package com.stratumn.canonicaljson;
 
 import java.io.IOException;
 /***
- * Helper class for canonicaliziong JSON
- * TODO support beans and datatypes by integrating GSON library and using generics to identify class type. 
+ * Helper class for canonicalization  JSON
  */
 public class CanonicalJson {
  
- 
+    
     /**
      * Converts an object to a string representation of type json.
      * Object is Map, Vector, null , String, Boolean,Double.
@@ -36,7 +35,7 @@ public class CanonicalJson {
     }
     
     /***
-     * Parse string to an Object of type map or vector
+     * Parse string to an Object of type map<String,Object> , Object[] or Boolean, BigDecimal, Boolean, null
      * @param source
      * @return
      * @throws IOException
@@ -45,6 +44,7 @@ public class CanonicalJson {
     {
     	return new Parser(source).parse();
     }
+     
     
     /***
      * Parses a string to object and converts it back to string in canonical Json form 

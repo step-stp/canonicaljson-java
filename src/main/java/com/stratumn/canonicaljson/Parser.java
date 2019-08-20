@@ -33,6 +33,7 @@ import static com.stratumn.canonicaljson.Constants.C_TAB;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.Vector;
 import java.util.regex.Pattern;
@@ -127,7 +128,7 @@ public class Parser
     * @return
     * @throws IOException
     */
-   private Object parseObject() throws IOException
+   private Map<String, Object> parseObject() throws IOException
    {
       TreeMap<String, Object> dict = new TreeMap<String, Object>();
       boolean next = false;
@@ -156,7 +157,7 @@ public class Parser
     * @return
     * @throws IOException
     */
-   private Object parseArray() throws IOException
+   private Object[] parseArray() throws IOException
    {
       Vector<Object> array = new Vector<Object>();
       boolean next = false;
@@ -170,7 +171,7 @@ public class Parser
          array.add(parseElement());
       }
       scan();
-      return array;
+      return array.toArray();
    }
 
    /***
