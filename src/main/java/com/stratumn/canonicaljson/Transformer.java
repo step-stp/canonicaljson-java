@@ -35,7 +35,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 /***
@@ -249,7 +248,7 @@ public class Transformer
                      {
                         try { 
                            //attempt to serialize unknown type.
-                           String json = getGsonInstance().toJson(o);
+                           String json = getGsonBuilderInstance().create().toJson(o);
                            //parse and searialize it to make sure its canonicalized.
                            serialize( new Parser(json).parse());
                         }
@@ -271,21 +270,18 @@ public class Transformer
    }
    
    /**
-    * Gson instance lazy initialization.
+    * GsonBuilder instance lazy initialization.
     */
-   private Gson gson;
-   private Gson getGsonInstance()
+   private GsonBuilder gsonBuilder;
+   private GsonBuilder getGsonBuilderInstance()
    {
-      if (gson==null)
+      if (gsonBuilder==null)
       {    
-         GsonBuilder builder = new GsonBuilder();
-            
-          builder.serializeNulls();
-
-          gson = builder.create();
-      
+          gsonBuilder = new GsonBuilder();
+           
+          gsonBuilder.serializeNulls().disableHtmlEscaping(); 
       }
-      return gson;
+      return gsonBuilder;
    }
    
  
