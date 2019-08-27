@@ -43,12 +43,16 @@ goto error
   
  SET JAVA_EXE="%JAVA_HOME%\bin\java.exe"
 
-IF NOT exist "target\canonicaljson\CanonicalJson.jar" (
-Echo Building classes
-	 call mvnw.cmd  package  -DskipTests
+ 
+Echo Clean Building classes
+	 Echo BUILDING AND INSTALLING CANONICAL  
+	 call mvnw.cmd  clean
+	 call mvnw.cmd  package install -DskipTests
+	 Echo TESTING 
+	 call mvnw.cmd test 
 Echo Building complete
-)
 
+ 
 Echo Executing CanonicalJson on %1
 %JAVA_EXE%  -cp .\target\canonicaljson\CanonicalJson.jar;.\target\test-classes com.stratumn.canonicaljson.CanonicalJsonTest %1  
 @REM %JAVA_EXE%  -cp .\target\classes;.\target\test-classes com.stratumn.canonicaljson.CanonicalJsonTest %1
