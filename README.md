@@ -1,20 +1,23 @@
-# canonicaljson-java
+# Java Canonicaljson
 
-1 - Make sure the Java home paths are added for the installed JDK
 
-2 - Using the command line run:
+Java library for producing JSON in canonical format as specified by [https://gibson042.github.io/canonicaljson-spec/](https://gibson042.github.io/canonicaljson-spec/). The provided interface matches that of native JSON object.
 
-RunTest.cmd [put path for folder]
+## Installation
 
-All subfolders with an input.json (and expected.json) will be picked up and processed as follows:
-1- The file input.json will be parsed 
-2- The resulting object will be stringify-ed 
-3- If expected.json is available it will be compared to the result string.
-4- An output.json will be created with the result of the process.
+### Maven
+```bash
+com.stratumn.canonicaljson
+```
 
-or  
+## Usage
 
-RunTest.cmd [put path for JSON file]
+```python
+import com.stratumn.canonicaljson;
 
-The input file will be parsed and the result object stringify-ed and an output.json will be created in the same folder. 
+String result = CanonicalJson.stringify(CanonicalJson.parse("{ \"a\": 12 }"));
+```
 
+
+## Development
+Integration tests are located in [canonicaljson-spec](https://gibson042.github.io/canonicaljson-spec/)  .
